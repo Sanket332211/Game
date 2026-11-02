@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Unity Slot Machine Game - WebGL Player</title>
+  <title>Classic Royal Casino Slot Machine</title>
   <style>
     * {
       box-sizing: border-box;
@@ -13,7 +13,7 @@
       -webkit-user-select: none;
     }
     body {
-      background: #0d0f18;
+      background: #090a10;
       color: #fff;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       display: flex;
@@ -29,49 +29,49 @@
       height: 640px;
       max-width: 100vw;
       max-height: 100vh;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 40px rgba(255,215,0,0.15);
+      box-shadow: 0 25px 80px rgba(0,0,0,0.9), 0 0 50px rgba(241, 196, 15, 0.2);
       border-radius: 16px;
       overflow: hidden;
-      background: #111;
+      background: #111424;
     }
     canvas {
       width: 100%;
       height: 100%;
       display: block;
+      cursor: default;
     }
-    /* Overlay UI */
+    /* Modal Dialog */
     .modal-overlay {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(0, 0, 0, 0.8);
       display: flex;
       justify-content: center;
       align-items: center;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.25s ease;
+      transition: opacity 0.2s ease;
       z-index: 100;
-      backdrop-filter: blur(4px);
+      backdrop-filter: blur(5px);
     }
     .modal-overlay.active {
       opacity: 1;
       pointer-events: auto;
     }
     .modal-content {
-      background: linear-gradient(145deg, #1e2238, #111424);
+      background: linear-gradient(145deg, #1e2238, #0e111d);
       border: 3px solid #f1c40f;
       border-radius: 16px;
       padding: 24px 32px;
       width: 90%;
-      max-width: 560px;
+      max-width: 580px;
       text-align: center;
-      box-shadow: 0 10px 40px rgba(241, 196, 15, 0.3);
-      position: relative;
-      transform: scale(0.9);
-      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 10px 40px rgba(241, 196, 15, 0.4);
+      transform: scale(0.92);
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .modal-overlay.active .modal-content {
       transform: scale(1);
@@ -83,6 +83,7 @@
       text-transform: uppercase;
       letter-spacing: 2px;
       font-weight: 800;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
     }
     .paytable-grid {
       display: grid;
@@ -92,8 +93,8 @@
     }
     .paytable-item {
       background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 215, 0, 0.3);
-      border-radius: 8px;
+      border: 1px solid rgba(255, 215, 0, 0.35);
+      border-radius: 10px;
       padding: 10px;
       display: flex;
       flex-direction: column;
@@ -101,8 +102,8 @@
       gap: 6px;
     }
     .paytable-item img {
-      width: 48px;
-      height: 48px;
+      width: 52px;
+      height: 52px;
       object-fit: contain;
     }
     .paytable-item span {
@@ -113,20 +114,21 @@
     .paytable-item .mult {
       color: #2ecc71;
       font-size: 14px;
+      font-weight: 800;
     }
     .bonus-rules {
-      background: rgba(241, 196, 15, 0.1);
+      background: rgba(241, 196, 15, 0.12);
       border-left: 4px solid #f1c40f;
-      padding: 10px;
-      margin-top: 12px;
+      padding: 12px;
+      margin-top: 14px;
       text-align: left;
-      font-size: 12px;
-      line-height: 1.4;
-      border-radius: 4px;
+      font-size: 13px;
+      line-height: 1.45;
+      border-radius: 6px;
     }
     .btn-close {
-      margin-top: 18px;
-      padding: 10px 32px;
+      margin-top: 20px;
+      padding: 10px 36px;
       font-size: 16px;
       font-weight: bold;
       background: linear-gradient(180deg, #f39c12, #d35400);
@@ -134,11 +136,11 @@
       border: none;
       border-radius: 24px;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(211, 84, 0, 0.5);
+      box-shadow: 0 4px 15px rgba(211, 84, 0, 0.6);
       transition: transform 0.1s, filter 0.2s;
     }
     .btn-close:hover {
-      filter: brightness(1.15);
+      filter: brightness(1.2);
       transform: translateY(-2px);
     }
     /* Win Celebration Popup */
@@ -147,11 +149,11 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) scale(0);
-      background: radial-gradient(circle, #2c0e37 0%, #0d0414 100%);
+      background: radial-gradient(circle, #3b074d 0%, #0d0414 100%);
       border: 4px solid #f1c40f;
-      box-shadow: 0 0 60px rgba(241, 196, 15, 0.8), inset 0 0 20px rgba(241, 196, 15, 0.4);
-      padding: 28px 48px;
-      border-radius: 20px;
+      box-shadow: 0 0 60px rgba(241, 196, 15, 0.9), inset 0 0 25px rgba(241, 196, 15, 0.5);
+      padding: 30px 50px;
+      border-radius: 24px;
       text-align: center;
       z-index: 90;
       opacity: 0;
@@ -164,20 +166,20 @@
       pointer-events: auto;
     }
     .win-popup h2 {
-      font-size: 32px;
+      font-size: 34px;
       color: #f1c40f;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+      text-shadow: 0 2px 10px rgba(0,0,0,0.9);
       letter-spacing: 2px;
     }
     .win-popup .payout-num {
-      font-size: 42px;
+      font-size: 46px;
       font-weight: 900;
       color: #2ecc71;
-      margin: 12px 0;
-      text-shadow: 0 0 15px rgba(46, 204, 113, 0.8);
+      margin: 14px 0;
+      text-shadow: 0 0 20px rgba(46, 204, 113, 0.9);
     }
     .win-popup p {
-      font-size: 15px;
+      font-size: 16px;
       color: #e2e8f0;
     }
   </style>
@@ -243,7 +245,7 @@
 
   <script>
     // =========================================================================
-    // Game Audio Engine (Web Audio API with synthesized / loaded fallbacks)
+    // Sound Engine (Web Audio API)
     // =========================================================================
     class SoundEngine {
       constructor() {
@@ -345,7 +347,7 @@
     sound.load('coins_cascade', 'assets/coins_cascade.wav');
 
     // =========================================================================
-    // Symbol Definitions & Paytable
+    // Symbol Definitions & Image Loader
     // =========================================================================
     const SYMBOLS = [
       { id: 0, name: 'Cherry', file: 'assets/slot-symbol1.png', mult3: 5, mult2: 1.5, weight: 32, isWild: false, isScatter: false },
@@ -356,16 +358,9 @@
       { id: 5, name: 'Scatter', file: 'assets/slot-symbol6_scatter.png', mult3: 5, mult2: 0, weight: 3, isWild: false, isScatter: true }
     ];
 
-    // Image loader
     const images = {};
     const imgFiles = {
       bg: 'assets/bg_gradient.png',
-      middle_box: 'assets/slot_machine_Middle_box.png',
-      lever1: 'assets/slot-machine1.png',
-      lever2: 'assets/slot-machine2.png',
-      lever3: 'assets/slot-machine3.png',
-      lever4: 'assets/slot-machine4.png',
-      lever5: 'assets/slot-machine5.png',
       sym0: 'assets/slot-symbol1.png',
       sym1: 'assets/slot-symbol2.png',
       sym2: 'assets/slot-symbol3.png',
@@ -375,7 +370,6 @@
     };
 
     let loadedCount = 0;
-    const totalImgs = Object.keys(imgFiles).length;
     for (const [key, path] of Object.entries(imgFiles)) {
       const img = new Image();
       img.src = path;
@@ -383,11 +377,8 @@
       images[key] = img;
     }
 
-    // =========================================================================
-    // Fair Weighted RNG Selection
-    // =========================================================================
+    // Weighted RNG selection
     const TOTAL_WEIGHT = SYMBOLS.reduce((acc, s) => acc + s.weight, 0);
-
     function getRandomSymbol() {
       let r = Math.random() * TOTAL_WEIGHT;
       for (const s of SYMBOLS) {
@@ -407,16 +398,16 @@
         this.y = y;
         this.width = width;
         this.height = height;
-        this.cellHeight = 90;
+        this.cellHeight = 100; // Height of each symbol slot
 
-        // Strip of 5 visible/buffer symbols
+        // 5 symbols on the strip: 0=far above, 1=top visible, 2=center payline, 3=bottom visible, 4=below
         this.symbols = [getRandomSymbol(), getRandomSymbol(), getRandomSymbol(), getRandomSymbol(), getRandomSymbol()];
         this.offsetY = 0;
         this.speed = 0;
-        this.maxSpeed = 1600;
+        this.maxSpeed = 1800;
         this.state = 'idle'; // idle, anticipation, spinning, decelerating, bouncing
         this.phaseTimer = 0;
-        this.targetSymbol = this.symbols[2]; // center
+        this.targetSymbol = this.symbols[2]; // center payline
         this.onStopped = null;
       }
 
@@ -434,24 +425,24 @@
         this.phaseTimer += dt;
 
         if (this.state === 'anticipation') {
-          // Upward recoil
+          // Upward recoil before spinning down
           const antDur = 0.15;
           if (this.phaseTimer < antDur) {
             const t = this.phaseTimer / antDur;
-            this.offsetY = -Math.sin(t * Math.PI) * 18;
+            this.offsetY = -Math.sin(t * Math.PI) * 20;
           } else {
             this.state = 'spinning';
             this.phaseTimer = 0;
-            this.speed = 200;
+            this.speed = 300;
           }
         } else if (this.state === 'spinning') {
           // Accelerate to max speed
           if (this.speed < this.maxSpeed) {
-            this.speed += 4000 * dt;
+            this.speed += 5000 * dt;
           }
           this.offsetY += this.speed * dt;
 
-          // Recycle
+          // Recycle symbols through top
           while (this.offsetY >= this.cellHeight) {
             this.offsetY -= this.cellHeight;
             this.symbols.pop();
@@ -461,15 +452,15 @@
           if (this.phaseTimer >= this.minSpinDuration) {
             this.state = 'decelerating';
             this.phaseTimer = 0;
-            // Inject target symbol at top so it rolls to center
+            // Inject target symbol at top so it scrolls into center
             this.symbols[0] = this.targetSymbol;
           }
         } else if (this.state === 'decelerating') {
-          // Ease-out deceleration
-          const decelDur = 0.4;
+          // Cubic ease-out deceleration
+          const decelDur = 0.45;
           const progress = Math.min(1, this.phaseTimer / decelDur);
           const easeOut = 1 - Math.pow(1 - progress, 3);
-          this.speed = Math.max(80, (1 - easeOut) * this.maxSpeed);
+          this.speed = Math.max(100, (1 - easeOut) * this.maxSpeed);
           this.offsetY += this.speed * dt;
 
           while (this.offsetY >= this.cellHeight) {
@@ -486,12 +477,12 @@
             this.offsetY = 0;
           }
         } else if (this.state === 'bouncing') {
-          // Damped spring oscillation: exp(-decay*t) * sin(freq*t)
+          // Damped spring bounce-back: exp(-decay*t) * sin(freq*t)
           const bounceDur = 0.25;
           if (this.phaseTimer < bounceDur) {
             const damping = Math.exp(-12 * this.phaseTimer);
             const osc = Math.sin(24 * this.phaseTimer);
-            this.offsetY = 20 * damping * osc;
+            this.offsetY = 22 * damping * osc;
           } else {
             this.offsetY = 0;
             this.state = 'idle';
@@ -502,29 +493,66 @@
 
       draw(ctx) {
         ctx.save();
+        // Clip to this reel's viewing window
         ctx.beginPath();
         ctx.rect(this.x, this.y, this.width, this.height);
         ctx.clip();
 
+        // White/Silver reel drum backing with gradient
+        const grad = ctx.createLinearGradient(this.x, this.y, this.x + this.width, this.y);
+        grad.addColorStop(0, '#e2e8f0');
+        grad.addColorStop(0.15, '#ffffff');
+        grad.addColorStop(0.85, '#ffffff');
+        grad.addColorStop(1, '#cbd5e1');
+        ctx.fillStyle = grad;
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+
+        // Center line
         const centerY = this.y + (this.height / 2);
+
+        // Draw symbols
         for (let i = 0; i < this.symbols.length; i++) {
           const sym = this.symbols[i];
-          // Slot positions relative to center
           const slotY = centerY + ((i - 2) * this.cellHeight) + this.offsetY;
 
           const imgKey = 'sym' + sym.id;
           const img = images[imgKey];
           if (img && img.complete) {
-            const drawSize = 80;
-            ctx.drawImage(img, this.x + (this.width - drawSize)/2, slotY - (drawSize/2), drawSize, drawSize);
+            const size = 88;
+            ctx.drawImage(img, this.x + (this.width - size)/2, slotY - (size/2), size, size);
+          } else {
+            // Text fallback if image is still decoding
+            ctx.fillStyle = '#0f172a';
+            ctx.font = 'bold 16px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(sym.name, this.x + this.width/2, slotY + 6);
           }
         }
+
+        // Top & Bottom 3D Cylinder shadow overlays
+        const topGrad = ctx.createLinearGradient(this.x, this.y, this.x, this.y + 45);
+        topGrad.addColorStop(0, 'rgba(0, 0, 0, 0.45)');
+        topGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = topGrad;
+        ctx.fillRect(this.x, this.y, this.width, 45);
+
+        const btmGrad = ctx.createLinearGradient(this.x, this.y + this.height - 45, this.x, this.y + this.height);
+        btmGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+        btmGrad.addColorStop(1, 'rgba(0, 0, 0, 0.45)');
+        ctx.fillStyle = btmGrad;
+        ctx.fillRect(this.x, this.y + this.height - 45, this.width, 45);
+
+        // Subtle vertical reel borders
+        ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(this.x, this.y, this.width, this.height);
+
         ctx.restore();
       }
     }
 
     // =========================================================================
-    // Game State & Economy
+    // Game Canvas Setup & Layout Coordinates
     // =========================================================================
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
@@ -538,25 +566,41 @@
     let autoSpinActive = false;
     let autoSpinsLeft = 0;
 
-    let machineState = 'idle'; // idle, lever, spinning, evaluating, celebrating
-    let leverFrame = 1;
-    let leverTimer = 0;
-    let leverPulling = false;
-
+    let machineState = 'idle'; // idle, pulling, spinning, evaluating, celebrating
     let statusText = 'PULL LEVER OR PRESS SPIN TO PLAY!';
 
-    // Setup Reels
-    const reelWidth = 110;
-    const reelHeight = 240;
-    const reelSpacing = 16;
-    const startX = 305;
-    const reelY = 195;
+    // Center Slot Machine Layout
+    const machineBox = {
+      x: 160,
+      y: 125,
+      w: 520,
+      h: 340
+    };
+
+    // 3 Reels positioned in the center of machineBox
+    const reelW = 140;
+    const reelH = 260;
+    const reelGap = 12;
+    const reelsStartX = machineBox.x + 38;
+    const reelsY = machineBox.y + 40;
 
     const reels = [
-      new Reel(0, startX, reelY, reelWidth, reelHeight),
-      new Reel(1, startX + reelWidth + reelSpacing, reelY, reelWidth, reelHeight),
-      new Reel(2, startX + (reelWidth + reelSpacing)*2, reelY, reelWidth, reelHeight)
+      new Reel(0, reelsStartX, reelsY, reelW, reelH),
+      new Reel(1, reelsStartX + reelW + reelGap, reelsY, reelW, reelH),
+      new Reel(2, reelsStartX + (reelW + reelGap)*2, reelsY, reelW, reelH)
     ];
+
+    // Animated Mechanical Lever on the Right
+    const leverConfig = {
+      x: 730,
+      y: 200,
+      baseRadius: 28,
+      rodLength: 160,
+      knobRadius: 22,
+      angle: 0.15, // idle angle in radians
+      targetAngle: 0.15,
+      isPulling: false
+    };
 
     function getBet() {
       return BET_TIERS[betIndex];
@@ -567,7 +611,7 @@
     }
 
     // =========================================================================
-    // Spin Mechanics
+    // Gameplay & Spin Sequences
     // =========================================================================
     function startSpin() {
       if (machineState !== 'idle') return;
@@ -586,10 +630,9 @@
         saveEconomy();
       }
 
-      machineState = 'lever';
-      leverPulling = true;
-      leverFrame = 1;
-      leverTimer = 0;
+      machineState = 'pulling';
+      leverConfig.isPulling = true;
+      leverConfig.targetAngle = 1.25; // Pull down
       lastWin = 0;
 
       sound.play('lever_pull');
@@ -599,18 +642,24 @@
       } else {
         statusText = 'SPINNING... GOOD LUCK!';
       }
+
+      // After lever pull stroke, start reels
+      setTimeout(() => {
+        onLeverPulled();
+      }, 160);
     }
 
-    function onLeverDown() {
+    function onLeverPulled() {
       machineState = 'spinning';
+      leverConfig.targetAngle = 0.15; // Spring back up
       sound.startSpinLoop();
 
-      // Determine outcomes via RNG
+      // Determine outcomes via weighted RNG
       const outcomes = [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()];
 
       let stoppedCount = 0;
       reels.forEach((r, idx) => {
-        const duration = 1.0 + (idx * 0.4);
+        const duration = 1.0 + (idx * 0.4); // Staggered delays: 1.0s, 1.4s, 1.8s
         r.spin(outcomes[idx], duration, (stoppedIdx, landedSymbol) => {
           stoppedCount++;
           sound.play('reel_stop_' + (stoppedIdx + 1), 1.0 + (stoppedIdx * 0.08));
@@ -625,14 +674,14 @@
     }
 
     // =========================================================================
-    // Evaluation Logic
+    // Outcome Evaluation Logic
     // =========================================================================
     function evaluateOutcomes(outcomes) {
       const isFree = freeSpins > 0;
       const mult = isFree ? 2 : 1;
       const bet = getBet();
 
-      // 1. Scatters
+      // 1. Scatters (Bonus Free Spins)
       const scatters = outcomes.filter(s => s.isScatter).length;
       if (scatters >= 3) {
         freeSpins += 10;
@@ -646,14 +695,14 @@
         return;
       }
 
-      // 2. Triple Wilds
+      // 2. Triple Wilds (Top Jackpot)
       if (outcomes.every(s => s.isWild)) {
         const win = bet * 100 * mult;
         balance += win;
         lastWin = win;
         saveEconomy();
         sound.play('big_win');
-        showWinPopup('MEGA JACKPOT!', `+${win} CREDITS`, 'TRIPLE WILDS! 100x Payout!');
+        showWinPopup('MEGA JACKPOT!', `+${win} CREDITS`, 'TRIPLE WILDS! 100x Top Jackpot!');
         finishSpin(win);
         return;
       }
@@ -680,7 +729,7 @@
 
         if (baseSymbol.mult3 >= 25) {
           sound.play('big_win');
-          showWinPopup('BIG WIN!', `+${win} CREDITS`, `3x ${baseSymbol.name}s! Won ${baseSymbol.mult3}x Bet!`);
+          showWinPopup('BIG WIN!', `+${win} CREDITS`, `3x ${baseSymbol.name}s! Payout: ${baseSymbol.mult3}x Bet!`);
         } else {
           sound.play('win_bell');
           statusText = `WINNER! 3x ${baseSymbol.name}! Payout: +${win} Credits!`;
@@ -689,7 +738,7 @@
         return;
       }
 
-      // 4. Consolation 2-of-a-Kind
+      // 4. Consolation 2-of-a-Kind (Reel 1 & 2 match)
       if (outcomes[0].id === outcomes[1].id && !outcomes[0].isScatter && outcomes[0].mult2 > 0) {
         const win = Math.round(bet * outcomes[0].mult2 * mult);
         balance += win;
@@ -760,9 +809,6 @@
       statusText = 'BANKROLL RESET TO 1,000 CREDITS.';
     }
 
-    // =========================================================================
-    // UI Modals
-    // =========================================================================
     function openPaytable() {
       sound.play('button_click');
       document.getElementById('paytableModal').classList.add('active');
@@ -776,16 +822,14 @@
       document.getElementById('winPopupAmount').innerText = amount;
       document.getElementById('winPopupDesc').innerText = desc;
       document.getElementById('winPopup').classList.add('show');
-      setTimeout(() => {
-        closeWinPopup();
-      }, 2500);
+      setTimeout(() => { closeWinPopup(); }, 2500);
     }
     function closeWinPopup() {
       document.getElementById('winPopup').classList.remove('show');
     }
 
     // =========================================================================
-    // Render Loop
+    // Master Render Loop
     // =========================================================================
     let lastTime = performance.now();
 
@@ -796,67 +840,23 @@
       // Update reels
       reels.forEach(r => r.update(dt));
 
-      // Update lever animation
-      if (leverPulling) {
-        leverTimer += dt;
-        if (leverTimer >= 0.05) {
-          leverTimer = 0;
-          leverFrame++;
-          if (leverFrame === 4) {
-            onLeverDown();
-          }
-          if (leverFrame > 5) {
-            leverFrame = 1;
-            leverPulling = false;
-          }
-        }
-      }
+      // Update lever angle physics
+      const leverSpeed = 12.0;
+      leverConfig.angle += (leverConfig.targetAngle - leverConfig.angle) * Math.min(1.0, leverSpeed * dt);
 
-      // Draw Background
-      if (images.bg.complete) {
+      // Clear button clickable list each frame
+      buttonBounds.length = 0;
+
+      // 1. Draw Background
+      if (images.bg && images.bg.complete) {
         ctx.drawImage(images.bg, 0, 0, 960, 640);
       } else {
-        ctx.fillStyle = '#111827';
+        ctx.fillStyle = '#0f172a';
         ctx.fillRect(0, 0, 960, 640);
       }
 
-      // Draw Reel Box Frame
-      const boxW = 440;
-      const boxH = 290;
-      const boxX = 260;
-      const boxY = 170;
-
-      // Reel background backing
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(boxX + 25, boxY + 25, boxW - 50, boxH - 50);
-
-      // Draw Reels inside frame
-      reels.forEach(r => r.draw(ctx));
-
-      // Payline center indicator lines
-      ctx.strokeStyle = 'rgba(239, 68, 68, 0.4)';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([6, 6]);
-      ctx.beginPath();
-      ctx.moveTo(boxX + 30, boxY + boxH/2);
-      ctx.lineTo(boxX + boxW - 30, boxY + boxH/2);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // Draw Middle Box metallic bezel
-      if (images.middle_box.complete) {
-        ctx.drawImage(images.middle_box, boxX, boxY, boxW, boxH);
-      }
-
-      // Draw Lever Frame on the right
-      const leverKey = 'lever' + leverFrame;
-      const leverImg = images[leverKey];
-      if (leverImg && leverImg.complete) {
-        ctx.drawImage(leverImg, 720, 160, 170, 320);
-      }
-
-      // Top Header / Machine Marquee
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+      // 2. Top Marquee Header
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
       ctx.fillRect(20, 15, 920, 90);
       ctx.strokeStyle = '#f1c40f';
       ctx.lineWidth = 2;
@@ -867,9 +867,8 @@
       ctx.textAlign = 'center';
       ctx.fillText('🎰 ROYAL CASINO SLOT MACHINE 🎰', 480, 52);
 
-      // Free Spins Indicator Banner
       if (freeSpins > 0) {
-        ctx.fillStyle = '#e74c3c';
+        ctx.fillStyle = '#ef4444';
         ctx.font = '700 18px "Segoe UI", sans-serif';
         ctx.fillText(`🔥 FREE SPINS ACTIVE: ${freeSpins} REMAINING (2x MULTIPLIER) 🔥`, 480, 85);
       } else {
@@ -878,7 +877,82 @@
         ctx.fillText(statusText, 480, 85);
       }
 
-      // Bottom Control Panel / HUD
+      // 3. Slot Machine Cabinet Bezel (Center Housing)
+      const bx = machineBox.x;
+      const by = machineBox.y;
+      const bw = machineBox.w;
+      const bh = machineBox.h;
+
+      // Outer Gold Bezel
+      ctx.save();
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+      ctx.shadowBlur = 25;
+      ctx.shadowOffsetY = 10;
+
+      const bezelGrad = ctx.createLinearGradient(bx, by, bx, by + bh);
+      bezelGrad.addColorStop(0, '#f59e0b');
+      bezelGrad.addColorStop(0.3, '#d97706');
+      bezelGrad.addColorStop(0.7, '#78350f');
+      bezelGrad.addColorStop(1, '#f59e0b');
+
+      ctx.fillStyle = bezelGrad;
+      ctx.beginPath();
+      ctx.roundRect(bx, by, bw, bh, 20);
+      ctx.fill();
+
+      ctx.strokeStyle = '#fef08a';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+      ctx.restore();
+
+      // Inner Dark Frame
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.roundRect(bx + 18, by + 18, bw - 36, bh - 36, 12);
+      ctx.fill();
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // 4. DRAW THE 3 REELS (Visible, Crisp, Front & Center!)
+      reels.forEach(r => r.draw(ctx));
+
+      // 5. Center Payline Marker Lines & Arrows
+      const paylineY = reelsY + (reelH / 2);
+      ctx.save();
+      // Red dashed payline
+      ctx.strokeStyle = 'rgba(239, 68, 68, 0.65)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([8, 6]);
+      ctx.beginPath();
+      ctx.moveTo(reelsStartX - 8, paylineY);
+      ctx.lineTo(reelsStartX + (reelW * 3) + (reelGap * 2) + 8, paylineY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Left Payline Indicator Arrow
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.moveTo(reelsStartX - 20, paylineY - 8);
+      ctx.lineTo(reelsStartX - 8, paylineY);
+      ctx.lineTo(reelsStartX - 20, paylineY + 8);
+      ctx.closePath();
+      ctx.fill();
+
+      // Right Payline Indicator Arrow
+      const rightX = reelsStartX + (reelW * 3) + (reelGap * 2);
+      ctx.beginPath();
+      ctx.moveTo(rightX + 20, paylineY - 8);
+      ctx.lineTo(rightX + 8, paylineY);
+      ctx.lineTo(rightX + 20, paylineY + 8);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      // 6. Draw Animated 3D Lever on the Right
+      drawMechanicalLever(ctx, leverConfig);
+
+      // 7. Bottom Control Panel / HUD
       const panelY = 480;
       ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
       ctx.fillRect(20, panelY, 920, 140);
@@ -891,7 +965,7 @@
       drawStatBox(ctx, 195, panelY + 15, 110, 55, 'BET', getBet().toString(), '#f1c40f');
       drawStatBox(ctx, 320, panelY + 15, 130, 55, 'LAST WIN', (lastWin > 0 ? `+${lastWin}` : '0'), '#38bdf8');
 
-      // Buttons
+      // Control Buttons
       const isSpinActive = machineState !== 'idle';
 
       // [-] Bet
@@ -921,10 +995,81 @@
       requestAnimationFrame(render);
     }
 
+    // Helper: Draw animated mechanical lever with 3D chrome rod & red knob
+    function drawMechanicalLever(ctx, cfg) {
+      ctx.save();
+      const bx = cfg.x;
+      const by = cfg.y;
+
+      // Lever Base Box attached to slot machine
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(bx - 15, by - 40, 30, 160);
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(bx - 15, by - 40, 30, 160);
+
+      // Pivot Socket
+      ctx.fillStyle = '#334155';
+      ctx.beginPath();
+      ctx.arc(bx, by + 40, 18, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // Lever Rod & Knob rotated by cfg.angle
+      const pivotX = bx;
+      const pivotY = by + 40;
+      const currentAngle = -Math.PI/2 + cfg.angle; // 0 = straight up, >0 = pulled down
+
+      const endX = pivotX + Math.cos(currentAngle) * cfg.rodLength;
+      const endY = pivotY + Math.sin(currentAngle) * cfg.rodLength;
+
+      // Chrome Rod
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 10;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(pivotX, pivotY);
+      ctx.lineTo(endX, endY);
+      ctx.stroke();
+
+      // Rod Highlight
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(pivotX, pivotY);
+      ctx.lineTo(endX, endY);
+      ctx.stroke();
+
+      // Red Metallic Knob
+      const knobGrad = ctx.createRadialGradient(endX - 5, endY - 5, 2, endX, endY, cfg.knobRadius);
+      knobGrad.addColorStop(0, '#f87171');
+      knobGrad.addColorStop(0.5, '#dc2626');
+      knobGrad.addColorStop(1, '#7f1d1d');
+
+      ctx.fillStyle = knobGrad;
+      ctx.beginPath();
+      ctx.arc(endX, endY, cfg.knobRadius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#fca5a5';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Lever Clickable Tag Text
+      ctx.fillStyle = '#f1c40f';
+      ctx.font = 'bold 12px "Segoe UI", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('PULL', bx, by + 90);
+      ctx.fillText('LEVER', bx, by + 105);
+
+      ctx.restore();
+    }
+
     function drawStatBox(ctx, x, y, w, h, label, value, color) {
-      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
       ctx.fillRect(x, y, w, h);
-      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+      ctx.strokeStyle = 'rgba(255,255,255,0.18)';
       ctx.lineWidth = 1;
       ctx.strokeRect(x, y, w, h);
 
@@ -964,7 +1109,7 @@
     }
 
     // =========================================================================
-    // Pointer Interaction Handling
+    // Pointer / Click Handling
     // =========================================================================
     canvas.addEventListener('click', (e) => {
       const rect = canvas.getBoundingClientRect();
@@ -973,8 +1118,8 @@
       const clickX = (e.clientX - rect.left) * scaleX;
       const clickY = (e.clientY - rect.top) * scaleY;
 
-      // Check lever click
-      if (clickX >= 730 && clickX <= 870 && clickY >= 180 && clickY <= 450) {
+      // Check lever click area (around the rod and knob)
+      if (clickX >= 700 && clickX <= 880 && clickY >= 140 && clickY <= 420) {
         startSpin();
         return;
       }
@@ -1020,13 +1165,7 @@
       }
     });
 
-    // Clear bounds every frame before re-adding
-    const origRender = render;
-    render = function(time) {
-      buttonBounds.length = 0;
-      origRender(time);
-    };
-
+    // Start Animation Loop
     requestAnimationFrame(render);
   </script>
 </body>
