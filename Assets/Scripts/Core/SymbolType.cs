@@ -14,3 +14,4 @@ namespace SlotGame.Core
         Scatter = 5             // Bonus: Triggers Free Spins feature
     }
 }
+
