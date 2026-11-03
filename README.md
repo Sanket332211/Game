@@ -4,6 +4,8 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-WebGL%20%7C%20PC%20%7C%20Mobile-orange.svg)]()
 
+> 📌 **Reviewer Note**: For the dedicated assignment submission notes, architectural commentary, and requirements mapping requested in the email, please see [**SUBMISSION_NOTES.md**](SUBMISSION_NOTES.md).
+
 A complete, production-grade 3-reel slot machine game developed in **Unity (C#)** featuring physics-based reel animation with realistic bounce-back dynamics, fair weighted Random Number Generation (RNG), Wild symbol substitutions, Scatter Free Spins bonus rounds, audio engineering, and a responsive **WebGL** distribution build.
 
 ---
